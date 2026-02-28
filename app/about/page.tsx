@@ -7,8 +7,13 @@ export const metadata = {
     description: "Learn more about Hamza, the Soul Reaper behind Aizen.tr.",
 };
 
+export const revalidate = 0;
+
 export default async function AboutPage() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://aizen.tr'}/api/settings`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://aizen.tr'}/api/settings`, {
+        cache: 'no-store',
+        next: { revalidate: 0 }
+    });
     const settings = await res.json().catch(() => null);
 
     const content = settings?.aboutContent || "# About Me\n\nContent could not be loaded.";

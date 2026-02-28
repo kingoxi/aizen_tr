@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 export default async function AboutPage() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/settings`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://aizen.tr'}/api/settings`, { cache: 'no-store' });
     const settings = await res.json().catch(() => null);
 
     const content = settings?.aboutContent || "# About Me\n\nContent could not be loaded.";

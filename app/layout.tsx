@@ -40,6 +40,17 @@ export const metadata: Metadata = {
     "Web Development",
   ],
   authors: [{ name: "Hamza Nuriddinov" }],
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.ico" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/favicon/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "en_US",

@@ -19,18 +19,34 @@ const orbitron = Orbitron({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Aizen.tr",
-    default: "Aizen.tr — Soul Reaper's Digital Realm",
+    template: "%s | Hamza Nuriddinov",
+    default: "Hamza Nuriddinov — Full-stack Developer & Robotics Enthusiast",
   },
   description:
-    "Personal portfolio, blog, and project showcase. Anime-themed dark-mode website with neon aesthetics.",
-  keywords: ["portfolio", "blog", "projects", "anime", "developer", "aizen"],
-  authors: [{ name: "Aizen" }],
+    "Hamza Nuriddinov's personal portfolio and blog. Showcasing software projects, FRC robotics achievements, and deep dives into modern web development.",
+  keywords: [
+    "Hamza Nuriddinov",
+    "Software Developer",
+    "Robotics",
+    "FRC 6038",
+    "ITOBOT",
+    "Next.js",
+    "Portfolio",
+    "Full-stack Developer",
+    "Istanbul",
+    "Aizen.tr",
+    "Tech Blog",
+    "Digital Architect",
+    "Web Development",
+  ],
+  authors: [{ name: "Hamza Nuriddinov" }],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://aizen.tr",
     siteName: "Aizen.tr",
+    title: "Hamza Nuriddinov — Portfolio & Blog",
+    description: "Digital home of Hamza Nuriddinov. Explore software projects and developer insights.",
   },
 };
 

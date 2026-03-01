@@ -1,19 +1,17 @@
-"use client";
-import { useEffect, useState } from "react";
-import { getPosts, type Post } from "@/lib/api";
+import { getServerPosts, getServerSettings } from "@/lib/serverApi";
 import PostCard from "@/components/PostCard";
 import type { Metadata } from "next";
+import type { Post } from "@/lib/api";
 
-export default function BlogPage() {
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [loading, setLoading] = useState(true);
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Blog",
+        description: "Read my latest thoughts on software, robotics, and more.",
+    };
+}
 
-    useEffect(() => {
-        getPosts(1, 100)
-            .then((r) => setPosts(r.posts))
-            .catch(() => { })
-            .finally(() => setLoading(false));
-    }, []);
+export default async function BlogPage() {
+    const posts = await getServerPosts();
 
     return (
         <div className="min-h-screen px-4 py-16" style={{ background: "var(--color-dark-900)" }}>
@@ -35,19 +33,9 @@ export default function BlogPage() {
                 </div>
 
                 {/* Posts grid */}
-                {loading ? (
+                {posts.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {Array.from({ length: 6 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="rounded-xl h-72 animate-pulse"
-                                style={{ background: "rgba(124,58,237,0.05)", border: "1px solid rgba(124,58,237,0.1)" }}
-                            />
-                        ))}
-                    </div>
-                ) : posts.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {posts.map((post) => (
+                        {posts.map((post: Post) => (
                             <PostCard key={post.id} post={post} />
                         ))}
                     </div>

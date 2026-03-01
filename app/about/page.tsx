@@ -1,20 +1,17 @@
-import { getSettings } from "@/lib/api";
+import { getServerSettings } from "@/lib/serverApi";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import type { Metadata } from "next";
 
-export const metadata = {
-    title: "About | Aizen.tr",
-    description: "Learn more about Hamza, the Soul Reaper behind Aizen.tr.",
-};
-
-export const revalidate = 0;
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "About",
+        description: "Learn more about Hamza, the Soul Reaper behind Aizen.tr.",
+    };
+}
 
 export default async function AboutPage() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'https://aizen.tr'}/api/settings`, {
-        cache: 'no-store',
-        next: { revalidate: 0 }
-    });
-    const settings = await res.json().catch(() => null);
+    const settings = await getServerSettings();
 
     const content = settings?.aboutContent || "# About Me\n\nContent could not be loaded.";
 

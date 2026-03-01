@@ -13,6 +13,7 @@ export async function GET(request: Request) {
             aboutContent: "",
             backgroundType: "dynamic",
             backgroundMediaUrl: "",
+            backgroundMediaUrlMobile: "",
             profileName: "",
             profileTitle: "",
             profileImage: "",
@@ -21,7 +22,11 @@ export async function GET(request: Request) {
             githubUrl: "",
             linkedinUrl: "",
             instagramUrl: "",
-            phone: ""
+            phone: "",
+            metaTitle: "",
+            metaDescription: "",
+            metaKeywords: "",
+            quotes: []
         };
     }
     return NextResponse.json(settings);
@@ -38,6 +43,7 @@ export async function PUT(request: Request) {
             aboutContent: body.aboutContent || "",
             backgroundType: body.backgroundType || "dynamic",
             backgroundMediaUrl: body.backgroundMediaUrl || "",
+            backgroundMediaUrlMobile: body.backgroundMediaUrlMobile || "",
             profileName: body.profileName || "",
             profileTitle: body.profileTitle || "",
             profileImage: body.profileImage || "",
@@ -46,7 +52,11 @@ export async function PUT(request: Request) {
             githubUrl: body.githubUrl || "",
             linkedinUrl: body.linkedinUrl || "",
             instagramUrl: body.instagramUrl || "",
-            phone: body.phone || ""
+            phone: body.phone || "",
+            metaTitle: body.metaTitle || "",
+            metaDescription: body.metaDescription || "",
+            metaKeywords: body.metaKeywords || "",
+            quotes: body.quotes || []
         };
 
         writeJSON("settings.json", settings);

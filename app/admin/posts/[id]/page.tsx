@@ -15,7 +15,16 @@ export default function PostFormPage() {
     const { id } = useParams<{ id: string }>();
     const isNew = id === "new";
 
-    const [form, setForm] = useState({ title: "", slug: "", excerpt: "", content: "", cover_image: "" });
+    const [form, setForm] = useState({
+        title: "",
+        slug: "",
+        excerpt: "",
+        content: "",
+        cover_image: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: ""
+    });
     const [loading, setLoading] = useState(!isNew);
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -31,7 +40,16 @@ export default function PostFormPage() {
                     const p = posts.find((p) => p.id === id);
                     if (!p) { router.push("/admin/posts"); return; }
                     setOriginalPost(p);
-                    setForm({ title: p.title, slug: p.slug, excerpt: p.excerpt, content: p.content, cover_image: p.cover_image });
+                    setForm({
+                        title: p.title,
+                        slug: p.slug,
+                        excerpt: p.excerpt,
+                        content: p.content,
+                        cover_image: p.cover_image,
+                        metaTitle: p.metaTitle || "",
+                        metaDescription: p.metaDescription || "",
+                        metaKeywords: p.metaKeywords || ""
+                    });
                 })
                 .catch(() => router.push("/admin/login"))
                 .finally(() => setLoading(false));
@@ -164,6 +182,42 @@ export default function PostFormPage() {
                             required
                             style={{ resize: "vertical" }}
                         />
+                    </div>
+
+                    {/* SEO SECTION */}
+                    <div className="pt-6 mt-6 border-t border-purple-500/10 space-y-4">
+                        <h2 className="text-lg font-bold text-purple-400" style={{ fontFamily: "var(--font-orbitron)" }}>SEO Settings (Optional)</h2>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5" style={{ color: "#94a3b8" }}>Meta Title</label>
+                            <input
+                                value={form.metaTitle}
+                                onChange={(e) => setForm((p) => ({ ...p, metaTitle: e.target.value }))}
+                                className="neon-input"
+                                placeholder="Custom browser tab title"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5" style={{ color: "#94a3b8" }}>Meta Description</label>
+                            <textarea
+                                value={form.metaDescription}
+                                onChange={(e) => setForm((p) => ({ ...p, metaDescription: e.target.value }))}
+                                className="neon-input"
+                                rows={2}
+                                placeholder="Brief summary for search engines"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5" style={{ color: "#94a3b8" }}>Meta Keywords</label>
+                            <input
+                                value={form.metaKeywords}
+                                onChange={(e) => setForm((p) => ({ ...p, metaKeywords: e.target.value }))}
+                                className="neon-input"
+                                placeholder="keyword1, keyword2, keyword3"
+                            />
+                        </div>
                     </div>
 
                     <div className="flex gap-3 pt-2">

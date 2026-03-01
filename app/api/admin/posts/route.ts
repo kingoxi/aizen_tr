@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { title, slug, excerpt, content, cover_image } = body;
+        const { title, slug, excerpt, content, cover_image, metaTitle, metaDescription, metaKeywords } = body;
 
         if (!title || !slug || !content) {
             return NextResponse.json(
@@ -42,6 +42,9 @@ export async function POST(request: Request) {
             cover_image: cover_image || "",
             created_at: now,
             updated_at: now,
+            metaTitle: metaTitle || "",
+            metaDescription: metaDescription || "",
+            metaKeywords: metaKeywords || "",
         };
 
         posts.unshift(post);

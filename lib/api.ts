@@ -131,6 +131,9 @@ export interface Post {
     content: string;
     created_at: string;
     updated_at: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
 }
 
 export interface Project {
@@ -144,6 +147,9 @@ export interface Project {
     github_url: string;
     created_at: string;
     updated_at: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
 }
 
 export interface Contact {
@@ -167,6 +173,7 @@ export interface SiteSettings {
     aboutContent: string;
     backgroundType: "dynamic" | "video" | "none";
     backgroundMediaUrl: string;
+    backgroundMediaUrlMobile?: string;
     profileName?: string;
     profileTitle?: string;
     profileImage?: string;
@@ -176,4 +183,8 @@ export interface SiteSettings {
     linkedinUrl?: string;
     instagramUrl?: string;
     phone?: string;
+    metaTitle?: string;
+    metaDescription?: string;
+    metaKeywords?: string;
+    quotes?: string[];
 }

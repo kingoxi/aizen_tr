@@ -5,15 +5,13 @@ import PostCard from "@/components/PostCard";
 import ProjectCard from "@/components/ProjectCard";
 import { getPosts, getProjects, getSettings, type Post, type Project, type SiteSettings } from "@/lib/api";
 
-const AIZEN_QUOTES = [
+const DEFAULT_QUOTES = [
   "He is behind to everything",
   "Yare Yare.",
   "Always but soon",
   "Yokoso, watashi no soul society",
   "Always",
   "So Right",
-  "Yare Yare.",
-  "Yokoso...",
   "Aizen.tr"
 ];
 
@@ -29,17 +27,24 @@ export default function HomePage() {
   // Interactive background tracking
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [isMuted, setIsMuted] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     getPosts(1, 3).then((r) => setPosts(r.posts)).catch(() => { });
     getProjects().then((r) => setProjects(r.slice(0, 3))).catch(() => { });
-    getSettings().then((s) => setSettings(s)).catch(() => { });
-
-    // Quote rotation
-    const quoteInterval = setInterval(() => {
-      setQuoteIndex((prev) => (prev + 1) % AIZEN_QUOTES.length);
-    }, 3000);
+    getSettings().then((s) => {
+      setSettings(s);
+    }).catch(() => { });
 
     // Generate random shards for Kyoka Suigetsu effect
     const newShards = Array.from({ length: 15 }).map((_, i) => ({
@@ -65,11 +70,20 @@ export default function HomePage() {
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      clearInterval(quoteInterval);
     };
   }, []);
 
+  // Quotes Rotation logic based on settings
+  useEffect(() => {
+    const quotes = settings?.quotes?.length ? settings.quotes : DEFAULT_QUOTES;
+    const quoteInterval = setInterval(() => {
+      setQuoteIndex((prev) => (prev + 1) % quotes.length);
+    }, 4000);
+    return () => clearInterval(quoteInterval);
+  }, [settings?.quotes]);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (isMobile) return; // Disable cursor follow on mobile
     if (settings?.backgroundType === "dynamic") {
       const rect = e.currentTarget.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -78,20 +92,22 @@ export default function HomePage() {
     }
   };
 
+  const currentQuotes = settings?.quotes?.length ? settings.quotes : DEFAULT_QUOTES;
+
   return (
     <div>
       {/* ─── HERO ─────────────────────────────────────────────────────────────── */}
       <section
         className="relative min-h-screen flex items-center justify-center overflow-hidden transition-all duration-700"
         style={{
-          background: settings?.backgroundType === "dynamic"
+          background: settings?.backgroundType === "dynamic" && !isMobile
             ? `radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(147, 51, 234, 0.2) 0%, var(--color-dark-900) 60%)`
             : "var(--color-dark-900)"
         }}
         onMouseMove={handleMouseMove}
       >
         {/* Kyoka Suigetsu Shards */}
-        {shards.map((shard) => (
+        {!isMobile && shards.map((shard) => (
           <div
             key={shard.id}
             className="fragment-shard animate-reiatsu"
@@ -108,9 +124,10 @@ export default function HomePage() {
         ))}
 
         {/* Optional Video Background */}
-        {settings?.backgroundType === "video" && settings.backgroundMediaUrl && (
+        {settings?.backgroundType === "video" && (settings.backgroundMediaUrl || settings.backgroundMediaUrlMobile) && (
           <>
             <video
+              key={isMobile && settings.backgroundMediaUrlMobile ? 'mobile' : 'desktop'}
               ref={videoRef}
               autoPlay
               loop
@@ -118,7 +135,7 @@ export default function HomePage() {
               playsInline
               className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
             >
-              <source src={settings.backgroundMediaUrl} type="video/mp4" />
+              <source src={(isMobile && settings.backgroundMediaUrlMobile) ? settings.backgroundMediaUrlMobile : settings.backgroundMediaUrl} type="video/mp4" />
             </video>
             {/* Mute/Unmute Toggle in bottom right */}
             <div className="absolute bottom-30 right-10 z-30">
@@ -193,7 +210,7 @@ export default function HomePage() {
               className="text-xl sm:text-2xl italic font-light max-w-2xl mx-auto leading-relaxed reveal"
               style={{ color: "#cbd5e1", animation: "shatter 1s forwards" }}
             >
-              &ldquo;{AIZEN_QUOTES[quoteIndex]}&rdquo;
+              &ldquo;{currentQuotes[quoteIndex] || DEFAULT_QUOTES[0]}&rdquo;
             </p>
           </div>
 
@@ -222,6 +239,47 @@ export default function HomePage() {
             <div className="w-5 h-8 rounded-full border-2 border-purple-500/40 flex justify-center pt-1.5 animate-reiatsu">
               <div className="w-1.5 h-2 rounded-full bg-purple-500 animate-bounce" />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── ABOUT SUMMARY SECTION ───────────────────────────────────────────── */}
+      <section className="py-24 px-4 relative overflow-hidden" style={{ background: "var(--color-dark-900)" }}>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+          <div className="relative group reveal">
+            <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+            <div className="relative glass-card rounded-3xl overflow-hidden border border-white/10 aspect-square">
+              <img
+                src={settings?.profileImage || "/uploads/main-page/avatar.jpg"}
+                alt={settings?.profileName || "Hamza"}
+                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+              />
+            </div>
+          </div>
+          <div className="space-y-8 reveal">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: "#9333ea" }}>
+                Overview
+              </p>
+              <h2 className="text-4xl font-black mb-4" style={{ fontFamily: "var(--font-orbitron)", color: "#f1f5f9" }}>
+                The Architect: <span className="text-purple-500">{settings?.profileName || "Hamza"}</span>
+              </h2>
+              <p className="text-xl font-medium" style={{ color: "#a78bfa" }}>
+                {settings?.profileTitle || "Full-stack Developer"}
+              </p>
+            </div>
+            <div className="prose prose-invert max-w-none text-gray-400 leading-loose">
+              <p className="line-clamp-6">
+                {settings?.aboutContent?.replace(/[#*`]/g, '').slice(0, 500)}...
+              </p>
+            </div>
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-purple-400 hover:text-purple-300 transition-colors group"
+            >
+              Learn full history
+              <span className="group-hover:translate-x-2 transition-transform">→</span>
+            </Link>
           </div>
         </div>
       </section>

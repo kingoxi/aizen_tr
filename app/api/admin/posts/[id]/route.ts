@@ -20,7 +20,7 @@ export async function PUT(
             return NextResponse.json({ error: "Post not found" }, { status: 404 });
         }
 
-        const { title, slug, excerpt, content, cover_image } = body;
+        const { title, slug, excerpt, content, cover_image, metaTitle, metaDescription, metaKeywords } = body;
 
         posts[idx] = {
             ...posts[idx],
@@ -29,6 +29,9 @@ export async function PUT(
             excerpt: excerpt ?? posts[idx].excerpt,
             content: content || posts[idx].content,
             cover_image: cover_image ?? posts[idx].cover_image,
+            metaTitle: metaTitle ?? posts[idx].metaTitle,
+            metaDescription: metaDescription ?? posts[idx].metaDescription,
+            metaKeywords: metaKeywords ?? posts[idx].metaKeywords,
             updated_at: new Date().toISOString(),
         };
 

@@ -9,7 +9,12 @@ export async function GET() {
         settings = {
             aboutContent: "",
             backgroundType: "dynamic",
-            backgroundMediaUrl: ""
+            backgroundMediaUrl: "",
+            backgroundMediaUrlMobile: "",
+            metaTitle: "",
+            metaDescription: "",
+            metaKeywords: "",
+            quotes: []
         };
     }
 

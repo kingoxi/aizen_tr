@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { adminGetSettings, adminUpdateSettings, adminUpload, type SiteSettings } from "@/lib/api";
 
 export default function SettingsPage() {
@@ -26,6 +27,21 @@ export default function SettingsPage() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setSettings(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleQuoteChange = (index: number, value: string) => {
+        const newQuotes = [...(settings.quotes || [])];
+        newQuotes[index] = value;
+        setSettings(prev => ({ ...prev, quotes: newQuotes }));
+    };
+
+    const addQuote = () => {
+        setSettings(prev => ({ ...prev, quotes: [...(prev.quotes || []), ""] }));
+    };
+
+    const removeQuote = (index: number) => {
+        const newQuotes = (settings.quotes || []).filter((_, i) => i !== index);
+        setSettings(prev => ({ ...prev, quotes: newQuotes }));
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,156 +70,219 @@ export default function SettingsPage() {
             setMessage(error.message || "Failed to save settings");
         } finally {
             setSaving(false);
-            setTimeout(() => setMessage(""), 3000);
+            setTimeout(() => setMessage(""), 4000);
         }
     };
 
     if (loading) {
         return (
-            <div className="flex justify-center py-20">
-                <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+            <div className="flex items-center justify-center py-32">
+                <div className="w-12 h-12 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="space-y-8">
-            <div className="glass-card rounded-xl p-6 md:p-8">
-                <h1 className="text-2xl font-bold mb-6" style={{ fontFamily: "var(--font-orbitron)", color: "#f1f5f9" }}>
-                    Site Settings
-                </h1>
+        <div className="min-h-screen px-4 py-10" style={{ background: "var(--color-dark-900)" }}>
+            <div className="max-w-4xl mx-auto">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <Link href="/admin/dashboard" className="text-sm mb-1 flex items-center gap-1" style={{ color: "#64748b" }}>
+                            ← Dashboard
+                        </Link>
+                        <h1 className="text-2xl font-bold" style={{ color: "#f1f5f9", fontFamily: "var(--font-orbitron)" }}>
+                            Site Settings
+                        </h1>
+                    </div>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={saving}
+                        className="btn-neon px-6 py-2.5 rounded-lg text-sm disabled:opacity-50"
+                    >
+                        {saving ? "Saving..." : "Save Changes"}
+                    </button>
+                </div>
 
                 {message && (
-                    <div
-                        className={`p-4 rounded-lg mb-6 text-sm font-medium ${message.toLowerCase().includes("success") || message.toLowerCase().includes("upload") ? "neon-border" : "border-red-500/50 text-red-400 bg-red-500/10"}`}
-                        style={message.toLowerCase().includes("success") || message.toLowerCase().includes("upload") ? { color: "#a78bfa", background: "rgba(124,58,237,0.08)" } : {}}
-                    >
+                    <div className={`p-4 rounded-xl mb-6 text-sm border ${message.includes("success") ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400" : "bg-red-500/10 border-red-500/30 text-red-400"}`}>
                         {message}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-8">
-                    {/* ─── Profile Section ─── */}
-                    <div className="pt-4 border-t border-purple-500/10">
-                        <h2 className="text-lg font-bold mb-4 text-purple-400">Profile Information</h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div className="md:col-span-1">
-                                <label className="block text-sm font-medium mb-2 text-gray-400">Profile Image</label>
-                                <div className="relative group w-full aspect-square bg-black/40 rounded-xl overflow-hidden border border-purple-500/20 mb-2">
+                <div className="space-y-6">
+                    {/* Identity Section */}
+                    <section className="glass-card rounded-2xl p-6 border border-white/5">
+                        <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#f1f5f9", fontFamily: "var(--font-orbitron)" }}>
+                            <span className="text-purple-500 text-xl">👤</span> Identity
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <div className="space-y-4">
+                                <label className="block text-xs font-bold uppercase tracking-wider text-gray-500">Profile Image</label>
+                                <div className="relative group w-full aspect-square bg-black/20 rounded-xl overflow-hidden border border-white/10">
                                     {settings.profileImage ? (
                                         <img src={settings.profileImage} alt="profile" className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-600">No Image</div>
+                                        <div className="w-full h-full flex items-center justify-center text-gray-700 text-xs">No Image</div>
                                     )}
                                     <label className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
-                                        <span className="text-xs font-bold text-white">CHANGE</span>
+                                        <span className="text-xs font-bold text-white">Upload New</span>
                                         <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
                                     </label>
                                 </div>
                             </div>
-
                             <div className="md:col-span-2 space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1 text-gray-400">Display Name</label>
-                                    <input type="text" name="profileName" value={settings.profileName || ""} onChange={handleChange} className="neon-input" placeholder="Hamza (Aizen)" />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Name</label>
+                                        <input type="text" name="profileName" value={settings.profileName || ""} onChange={handleChange} className="neon-input text-sm" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Title</label>
+                                        <input type="text" name="profileTitle" value={settings.profileTitle || ""} onChange={handleChange} className="neon-input text-sm" />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1 text-gray-400">Professional Title</label>
-                                    <input type="text" name="profileTitle" value={settings.profileTitle || ""} onChange={handleChange} className="neon-input" placeholder="Full-stack Developer" />
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Location</label>
+                                    <input type="text" name="profileLocation" value={settings.profileLocation || ""} onChange={handleChange} className="neon-input text-sm" />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1 text-gray-400">Email Address</label>
-                                    <input type="email" name="profileEmail" value={settings.profileEmail || ""} onChange={handleChange} className="neon-input" placeholder="hamza@aizen.tr" />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Email</label>
+                                        <input type="email" name="profileEmail" value={settings.profileEmail || ""} onChange={handleChange} className="neon-input text-sm" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Phone</label>
+                                        <input type="text" name="phone" value={settings.phone || ""} onChange={handleChange} className="neon-input text-sm" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                    </section>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label className="block text-sm font-medium mb-1 text-gray-400">Location</label>
-                                <input type="text" name="profileLocation" value={settings.profileLocation || ""} onChange={handleChange} className="neon-input" placeholder="Soul Society" />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1 text-gray-400">Phone</label>
-                                <input type="text" name="phone" value={settings.phone || ""} onChange={handleChange} className="neon-input" placeholder="+90 5XX XXX XX XX" />
+                    {/* Appearance Section */}
+                    <section className="glass-card rounded-2xl p-6 border border-white/5">
+                        <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#f1f5f9", fontFamily: "var(--font-orbitron)" }}>
+                            <span className="text-purple-500 text-xl">🎨</span> Visuals
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Background Style</label>
+                                <select name="backgroundType" value={settings.backgroundType} onChange={handleChange} className="neon-input text-sm bg-transparent">
+                                    <option value="dynamic">✨ Dynamic Particles</option>
+                                    <option value="video">🎥 Video Background</option>
+                                    <option value="none">🌑 Minimal Dark</option>
+                                </select>
                             </div>
                         </div>
+                        {settings.backgroundType === "video" && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Desktop Video URL</label>
+                                    <input type="text" name="backgroundMediaUrl" value={settings.backgroundMediaUrl || ""} onChange={handleChange} className="neon-input text-sm font-mono" />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Mobile Video URL</label>
+                                    <input type="text" name="backgroundMediaUrlMobile" value={settings.backgroundMediaUrlMobile || ""} onChange={handleChange} className="neon-input text-sm font-mono" />
+                                </div>
+                            </div>
+                        )}
+                    </section>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                            <div>
-                                <label className="block text-sm font-medium mb-1 text-gray-400">GitHub URL</label>
-                                <input type="text" name="githubUrl" value={settings.githubUrl || ""} onChange={handleChange} className="neon-input" placeholder="https://github.com/..." />
+                    {/* Aizen Quotes Section */}
+                    <section className="glass-card rounded-2xl p-6 border border-white/5">
+                        <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#f1f5f9", fontFamily: "var(--font-orbitron)" }}>
+                            <span className="text-purple-500 text-xl">💬</span> Aizen Quotes
+                        </h2>
+                        <div className="space-y-3">
+                            {(settings.quotes || []).map((quote, idx) => (
+                                <div key={idx} className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={quote}
+                                        onChange={(e) => handleQuoteChange(idx, e.target.value)}
+                                        className="neon-input text-sm flex-1"
+                                        placeholder={`Quote #${idx + 1}`}
+                                    />
+                                    <button
+                                        onClick={() => removeQuote(idx)}
+                                        className="p-2 rounded-xl text-red-500 hover:bg-red-500/10 transition-colors border border-red-500/20"
+                                    >
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                    </button>
+                                </div>
+                            ))}
+                            <button
+                                onClick={addQuote}
+                                className="w-full py-3 rounded-xl border border-dashed border-purple-500/30 text-purple-400 text-xs font-bold uppercase tracking-widest hover:border-purple-500/60 hover:bg-purple-500/5 transition-all mt-2"
+                            >
+                                + Add New Quote
+                            </button>
+                        </div>
+                    </section>
+
+                    {/* SEO Section */}
+                    <section className="glass-card rounded-2xl p-6 border border-white/5">
+                        <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#f1f5f9", fontFamily: "var(--font-orbitron)" }}>
+                            <span className="text-purple-500 text-xl">🚀</span> SEO
+                        </h2>
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Master Title Tag</label>
+                                    <span className="text-[10px] text-gray-600">[{settings.metaTitle?.length || 0}/60]</span>
+                                </div>
+                                <input type="text" name="metaTitle" value={settings.metaTitle || ""} onChange={handleChange} className="neon-input text-sm" />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1 text-gray-400">LinkedIn URL</label>
-                                <input type="text" name="linkedinUrl" value={settings.linkedinUrl || ""} onChange={handleChange} className="neon-input" placeholder="https://linkedin.com/in/..." />
+                            <div className="space-y-1">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Master Description</label>
+                                    <span className="text-[10px] text-gray-600">[{settings.metaDescription?.length || 0}/160]</span>
+                                </div>
+                                <textarea name="metaDescription" value={settings.metaDescription || ""} onChange={handleChange} className="neon-input text-sm min-h-[80px]" />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1 text-gray-400">Instagram URL</label>
-                                <input type="text" name="instagramUrl" value={settings.instagramUrl || ""} onChange={handleChange} className="neon-input" placeholder="https://instagram.com/..." />
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Global Keywords (CSV)</label>
+                                <input type="text" name="metaKeywords" value={settings.metaKeywords || ""} onChange={handleChange} className="neon-input text-sm" placeholder="dev, portfolio, aizen" />
                             </div>
                         </div>
-                    </div>
+                    </section>
 
-                    {/* ─── Content Section ─── */}
-                    <div className="pt-4 border-t border-purple-500/10">
-                        <label className="block text-sm font-medium mb-2 text-purple-400">About Biography (Markdown)</label>
+                    {/* Social Section */}
+                    <section className="glass-card rounded-2xl p-6 border border-white/5">
+                        <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#f1f5f9", fontFamily: "var(--font-orbitron)" }}>
+                            <span className="text-purple-500 text-xl">🌐</span> Network
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">GitHub URL</label>
+                                <input type="text" name="githubUrl" value={settings.githubUrl || ""} onChange={handleChange} className="neon-input text-sm" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">LinkedIn URL</label>
+                                <input type="text" name="linkedinUrl" value={settings.linkedinUrl || ""} onChange={handleChange} className="neon-input text-sm" />
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Instagram URL</label>
+                                <input type="text" name="instagramUrl" value={settings.instagramUrl || ""} onChange={handleChange} className="neon-input text-sm" />
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* BIO Section */}
+                    <section className="glass-card rounded-2xl p-6 border border-white/5">
+                        <h2 className="text-lg font-bold mb-6 flex items-center gap-2" style={{ color: "#f1f5f9", fontFamily: "var(--font-orbitron)" }}>
+                            <span className="text-purple-500 text-xl">📝</span> Biography
+                        </h2>
                         <textarea
                             name="aboutContent"
                             value={settings.aboutContent}
                             onChange={handleChange}
-                            className="w-full bg-black/50 border rounded-lg p-4 text-white focus:outline-none focus:border-purple-500 transition-colors font-mono text-sm"
-                            style={{ borderColor: "rgba(147, 51, 234, 0.3)" }}
-                            rows={12}
-                            placeholder="# Heading&#10;&#10;Write about yourself here..."
+                            className="neon-input text-sm min-h-[300px] font-mono leading-relaxed p-6"
+                            placeholder="# About Me..."
                         />
-                    </div>
-
-                    {/* ─── Background Section ─── */}
-                    <div className="pt-4 border-t border-purple-500/10">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium mb-2 text-purple-400">Homepage Background Type</label>
-                                <select
-                                    name="backgroundType"
-                                    value={settings.backgroundType}
-                                    onChange={handleChange}
-                                    className="w-full bg-black/50 border rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 appearance-none"
-                                    style={{ borderColor: "rgba(147, 51, 234, 0.3)" }}
-                                >
-                                    <option value="dynamic">Interactive Dynamic Gradient</option>
-                                    <option value="video">Custom Video / GIF</option>
-                                    <option value="none">Flat Dark Theme</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium mb-2 text-purple-400">Background Video/GIF URL</label>
-                                <input
-                                    type="text"
-                                    name="backgroundMediaUrl"
-                                    value={settings.backgroundMediaUrl || ""}
-                                    onChange={handleChange}
-                                    disabled={settings.backgroundType !== "video"}
-                                    className="w-full bg-black/50 border rounded-lg p-3 text-white focus:outline-none focus:border-purple-500 disabled:opacity-50 transition-colors"
-                                    style={{ borderColor: "rgba(147, 51, 234, 0.3)" }}
-                                    placeholder="/uploads/video/bg.mp4"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="pt-8 border-t border-purple-500/20">
-                        <button
-                            type="submit"
-                            disabled={saving}
-                            className="btn-neon px-12 py-3 rounded-xl font-bold shadow-lg hover:shadow-purple-500/50 transition-all disabled:opacity-50 w-full md:w-auto"
-                        >
-                            {saving ? "Saving..." : "Save All Settings"}
-                        </button>
-                    </div>
-                </form>
+                    </section>
+                </div>
             </div>
         </div>
     );

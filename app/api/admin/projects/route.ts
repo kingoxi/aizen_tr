@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { name, slug, description, project_url, github_url, cover_image, gallery } = body;
+        const { name, slug, description, project_url, github_url, cover_image, gallery, metaTitle, metaDescription, metaKeywords } = body;
 
         if (!name || !slug) {
             return NextResponse.json({ error: "name and slug are required" }, { status: 400 });
@@ -41,6 +41,9 @@ export async function POST(request: Request) {
             github_url: github_url || "",
             created_at: now,
             updated_at: now,
+            metaTitle: metaTitle || "",
+            metaDescription: metaDescription || "",
+            metaKeywords: metaKeywords || "",
         };
 
         projects.unshift(project);

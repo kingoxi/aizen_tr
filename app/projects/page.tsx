@@ -1,18 +1,17 @@
-"use client";
-import { useEffect, useState } from "react";
-import { getProjects, type Project } from "@/lib/api";
+import { getServerProjects, getServerSettings } from "@/lib/serverApi";
 import ProjectCard from "@/components/ProjectCard";
+import type { Metadata } from "next";
+import type { Project } from "@/lib/api";
 
-export default function ProjectsPage() {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
+export async function generateMetadata(): Promise<Metadata> {
+    return {
+        title: "Projects",
+        description: "A showcase of my latest projects in software and robotics.",
+    };
+}
 
-    useEffect(() => {
-        getProjects()
-            .then(setProjects)
-            .catch(() => { })
-            .finally(() => setLoading(false));
-    }, []);
+export default async function ProjectsPage() {
+    const projects = await getServerProjects();
 
     return (
         <div className="min-h-screen px-4 py-16" style={{ background: "var(--color-dark-900)" }}>
@@ -31,19 +30,9 @@ export default function ProjectsPage() {
                     <p style={{ color: "#64748b" }}>Things I&apos;ve built with code and creativity</p>
                 </div>
 
-                {loading ? (
+                {projects.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {Array.from({ length: 6 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className="rounded-xl h-72 animate-pulse"
-                                style={{ background: "rgba(6,182,212,0.05)", border: "1px solid rgba(6,182,212,0.1)" }}
-                            />
-                        ))}
-                    </div>
-                ) : projects.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {projects.map((p) => (
+                        {projects.map((p: Project) => (
                             <ProjectCard key={p.id} project={p} />
                         ))}
                     </div>

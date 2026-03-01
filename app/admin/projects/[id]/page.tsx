@@ -23,6 +23,9 @@ export default function ProjectFormPage() {
         gallery: [] as string[],
         project_url: "",
         github_url: "",
+        metaTitle: "",
+        metaDescription: "",
+        metaKeywords: ""
     });
     const [loading, setLoading] = useState(!isNew);
     const [saving, setSaving] = useState(false);
@@ -36,9 +39,16 @@ export default function ProjectFormPage() {
                     const p = list.find((p) => p.id === id);
                     if (!p) { router.push("/admin/projects"); return; }
                     setForm({
-                        name: p.name, slug: p.slug, description: p.description,
-                        cover_image: p.cover_image, gallery: p.gallery || [],
-                        project_url: p.project_url, github_url: p.github_url,
+                        name: p.name,
+                        slug: p.slug,
+                        description: p.description,
+                        cover_image: p.cover_image,
+                        gallery: p.gallery || [],
+                        project_url: p.project_url,
+                        github_url: p.github_url,
+                        metaTitle: p.metaTitle || "",
+                        metaDescription: p.metaDescription || "",
+                        metaKeywords: p.metaKeywords || ""
                     });
                 })
                 .catch(() => router.push("/admin/login"))
@@ -270,6 +280,42 @@ export default function ProjectFormPage() {
                                 ))}
                             </div>
                         )}
+                    </div>
+
+                    {/* SEO SECTION */}
+                    <div className="pt-6 mt-6 border-t border-cyan-500/10 space-y-4">
+                        <h2 className="text-lg font-bold text-cyan-400" style={{ fontFamily: "var(--font-orbitron)" }}>SEO Settings (Optional)</h2>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5" style={{ color: "#94a3b8" }}>Meta Title</label>
+                            <input
+                                value={form.metaTitle}
+                                onChange={(e) => setForm((p) => ({ ...p, metaTitle: e.target.value }))}
+                                className="neon-input"
+                                placeholder="Custom browser tab title"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5" style={{ color: "#94a3b8" }}>Meta Description</label>
+                            <textarea
+                                value={form.metaDescription}
+                                onChange={(e) => setForm((p) => ({ ...p, metaDescription: e.target.value }))}
+                                className="neon-input"
+                                rows={2}
+                                placeholder="Brief summary for search engines"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5" style={{ color: "#94a3b8" }}>Meta Keywords</label>
+                            <input
+                                value={form.metaKeywords}
+                                onChange={(e) => setForm((p) => ({ ...p, metaKeywords: e.target.value }))}
+                                className="neon-input"
+                                placeholder="keyword1, keyword2, keyword3"
+                            />
+                        </div>
                     </div>
 
                     <div className="flex gap-3 pt-2">

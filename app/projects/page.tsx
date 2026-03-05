@@ -3,6 +3,8 @@ import ProjectCard from "@/components/ProjectCard";
 import type { Metadata } from "next";
 import type { Project } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
     return {
         title: "Projects",

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Metadata } from "next";
 import ProjectDetailClient from "./ProjectDetailClient";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     const resolvedParams = await params;
     const project = await getServerProject(resolvedParams.slug);

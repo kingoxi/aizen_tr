@@ -3,6 +3,8 @@ import PostCard from "@/components/PostCard";
 import type { Metadata } from "next";
 import type { Post } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata(): Promise<Metadata> {
     return {
         title: "Blog",

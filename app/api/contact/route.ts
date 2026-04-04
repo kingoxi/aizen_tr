@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createContact } from "@/lib/dataStore";
+import { createContact } from "@/lib/store";
 import { v4 as uuidv4 } from "uuid";
 import type { Contact, ContactFormData } from "@/lib/api";
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPostBySlug } from "@/lib/dataStore";
+import { getPostBySlug } from "@/lib/store";
 
 export async function GET(
     request: Request,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { findUserByUsername } from "@/lib/dataStore";
+import { findUserByUsername } from "@/lib/store";
 import { signToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 

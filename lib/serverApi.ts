@@ -5,7 +5,7 @@ import {
     getSettings,
     listPosts,
     listProjects,
-} from "./dataStore";
+} from "./store";
 
 /**
  * Direct server-side data access functions to avoid relative URL fetch issues 

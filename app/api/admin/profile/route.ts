@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { findUserById, findUserByUsername, updateUser } from "@/lib/dataStore";
+import { findUserById, findUserByUsername, updateUser } from "@/lib/store";
 import { authMiddleware, getAdminUser } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { deletePost, getPostBySlug, updatePost } from "@/lib/dataStore";
+import { deletePost, getPostBySlug, updatePost } from "@/lib/store";
 import { authMiddleware } from "@/lib/auth";
 
 export async function PUT(

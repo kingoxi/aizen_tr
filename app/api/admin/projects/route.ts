@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createProject, getProjectBySlug, listProjects } from "@/lib/dataStore";
+import { createProject, getProjectBySlug, listProjects } from "@/lib/store";
 import { authMiddleware } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 import type { Project } from "@/lib/api";

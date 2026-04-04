@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { applicationDefault, cert, getApps, initializeApp, type App, type ServiceAccount } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
+import { env } from "./env";
 
 type ServiceAccountLike = {
     project_id: string;
@@ -22,14 +23,14 @@ function normalizePrivateKey(privateKey: string): string {
 }
 
 function readServiceAccountFromEnvOrFile(): ServiceAccountLike | null {
-    const json = process.env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
+    const json = env.FIREBASE_SERVICE_ACCOUNT_JSON?.trim();
     if (json) {
         const parsed = JSON.parse(json) as ServiceAccountLike;
         parsed.private_key = normalizePrivateKey(parsed.private_key);
         return parsed;
     }
 
-    const filePath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH?.trim();
+    const filePath = env.FIREBASE_SERVICE_ACCOUNT_PATH?.trim();
     if (filePath) {
         const absolute = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath);
         const content = fs.readFileSync(absolute, "utf8");
@@ -52,7 +53,7 @@ export function getFirebaseAdminApp(): App {
     }
 
     const serviceAccount = readServiceAccountFromEnvOrFile();
-    const projectId = process.env.FIREBASE_PROJECT_ID || serviceAccount?.project_id;
+    const projectId = env.FIREBASE_PROJECT_ID || serviceAccount?.project_id;
 
     globalThis.__aizenFirebaseAdminApp = initializeApp({
         credential: serviceAccount ? cert(serviceAccount as unknown as ServiceAccount) : applicationDefault(),

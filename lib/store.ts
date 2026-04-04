@@ -5,6 +5,7 @@ import { DEFAULT_SITE_SETTINGS, normalizeSiteSettings } from "./defaults";
 import type { Contact, Post, Project, SiteSettings } from "./api";
 import { readJSON, writeJSON } from "./jsonStore";
 import { getFirebaseAdminFirestore } from "./firebaseAdmin";
+import { env } from "./env";
 
 type JsonUser = {
     id: string;
@@ -184,8 +185,8 @@ async function ensureFirestoreSeeded(db: Firestore): Promise<void> {
         }
 
         // Ensure bootstrap admin exists (does NOT overwrite existing user)
-        const bootstrapUsername = process.env.ADMIN_USERNAME || "admin";
-        const bootstrapPassword = process.env.ADMIN_PASSWORD || "admin123";
+        const bootstrapUsername = env.ADMIN_USERNAME;
+        const bootstrapPassword = env.ADMIN_PASSWORD;
         const existing = await db.collection("users").where("username", "==", bootstrapUsername).limit(1).get();
         if (existing.empty) {
             const now = new Date().toISOString();
@@ -623,7 +624,7 @@ export async function getDbHealth(): Promise<{
         return {
             ok: true,
             backend: "firestore",
-            projectId: process.env.FIREBASE_PROJECT_ID,
+            projectId: env.FIREBASE_PROJECT_ID,
             counts: {
                 posts: postsCount.data().count,
                 projects: projectsCount.data().count,
@@ -636,7 +637,7 @@ export async function getDbHealth(): Promise<{
             return {
                 ok: false,
                 backend: "firestore",
-                projectId: process.env.FIREBASE_PROJECT_ID,
+                projectId: env.FIREBASE_PROJECT_ID,
                 error: error instanceof Error ? error.message : "Firestore error",
             };
         }
@@ -644,7 +645,7 @@ export async function getDbHealth(): Promise<{
         return {
             ok: true,
             backend: "json",
-            projectId: process.env.FIREBASE_PROJECT_ID,
+            projectId: env.FIREBASE_PROJECT_ID,
             counts: {
                 posts: readPostsJson().length,
                 projects: readProjectsJson().length,

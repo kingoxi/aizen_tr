@@ -38,7 +38,7 @@ export default function Navbar() {
 
                         className="flex items-center gap-2 group cursor-pointer select-none"
                     >
-                        <a href="/">
+                        <Link href="/">
                             <div
                                 onAuxClick={handleSecretAdminAccess}
                                 className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
@@ -49,7 +49,7 @@ export default function Navbar() {
                             >
                                 A
                             </div>
-                        </a>
+                        </Link>
                         <span
                             className="font-bold text-xl"
                             style={{
@@ -60,7 +60,7 @@ export default function Navbar() {
                                 backgroundClip: "text",
                             }}
                         >
-                            <a href="/">Aizen.tr</a>
+                            <Link href="/">Aizen.tr</Link>
                         </span>
                     </div>
 

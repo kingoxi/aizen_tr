@@ -49,8 +49,8 @@ export default function ProfilePage() {
             if (form.newUsername || form.newPassword) {
                 setTimeout(() => router.push("/admin/login"), 2000);
             }
-        } catch (error: any) {
-            setMessage({ text: error.message, type: "error" });
+        } catch (error: unknown) {
+            setMessage({ text: error instanceof Error ? error.message : "Update failed", type: "error" });
         } finally {
             setLoading(false);
         }

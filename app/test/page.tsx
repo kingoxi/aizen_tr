@@ -5,8 +5,8 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
     return {
-        title: "DB Test",
-        description: "Database connectivity test page for Aizen.tr.",
+        title: "Backend Test",
+        description: "Firestore connectivity test page for Aizen.tr.",
     };
 }
 
@@ -24,7 +24,7 @@ export default async function TestPage() {
                         /test
                     </h1>
                     <p style={{ color: "#64748b" }}>
-                        DB durumu ve fallback (JSON) bilgisi.
+                        Firestore durumu ve fallback (JSON) bilgisi.
                     </p>
                 </div>
 
@@ -38,7 +38,7 @@ export default async function TestPage() {
                     <div className="flex items-center justify-between gap-4 flex-wrap">
                         <div>
                             <p className="text-xs uppercase tracking-widest font-bold" style={{ color: "#64748b" }}>Backend</p>
-                            <p className="text-2xl font-black" style={{ fontFamily: "var(--font-orbitron)", color: health.backend === "db" ? "#22c55e" : "#f59e0b" }}>
+                            <p className="text-2xl font-black" style={{ fontFamily: "var(--font-orbitron)", color: health.backend === "firestore" ? "#22c55e" : "#f59e0b" }}>
                                 {health.backend.toUpperCase()}
                             </p>
                         </div>
@@ -50,17 +50,14 @@ export default async function TestPage() {
                         </div>
                     </div>
 
-                    {health.connection && (
+                    {health.projectId && (
                         <div className="mt-5 text-sm" style={{ color: "#94a3b8" }}>
-                            <div><span style={{ color: "#64748b" }}>Host:</span> {health.connection.host || "-"}</div>
-                            <div><span style={{ color: "#64748b" }}>Port:</span> {health.connection.port ?? "-"}</div>
-                            <div><span style={{ color: "#64748b" }}>DB:</span> {health.connection.database || "-"}</div>
-                            <div><span style={{ color: "#64748b" }}>User:</span> {health.connection.user || "-"}</div>
+                            <div><span style={{ color: "#64748b" }}>Project:</span> {health.projectId}</div>
                         </div>
                     )}
 
                     {health.error && (
-                        <div className="mt-5 text-sm" style={{ color: health.backend === "db" ? "#f87171" : "#f59e0b" }}>
+                        <div className="mt-5 text-sm" style={{ color: health.backend === "firestore" ? "#f87171" : "#f59e0b" }}>
                             {health.error}
                         </div>
                     )}
@@ -87,4 +84,3 @@ export default async function TestPage() {
         </div>
     );
 }
-

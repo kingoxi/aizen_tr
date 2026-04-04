@@ -52,8 +52,8 @@ export default function SettingsPage() {
             const res = await adminUpload(file, "projects", "main-page");
             setSettings(prev => ({ ...prev, profileImage: res.url }));
             setMessage("Image uploaded! Don't forget to save settings.");
-        } catch (error: any) {
-            setMessage(error.message || "Upload failed");
+        } catch (error: unknown) {
+            setMessage(error instanceof Error ? error.message : "Upload failed");
         } finally {
             setSaving(false);
         }
@@ -66,8 +66,8 @@ export default function SettingsPage() {
         try {
             await adminUpdateSettings(settings);
             setMessage("Settings saved successfully!");
-        } catch (error: any) {
-            setMessage(error.message || "Failed to save settings");
+        } catch (error: unknown) {
+            setMessage(error instanceof Error ? error.message : "Failed to save settings");
         } finally {
             setSaving(false);
             setTimeout(() => setMessage(""), 4000);

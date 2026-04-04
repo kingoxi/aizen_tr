@@ -1,21 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CursorTracker from "@/components/CursorTracker";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const orbitron = Orbitron({
-  variable: "--font-orbitron",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 import { getServerSettings } from "@/lib/serverApi";
 
@@ -67,12 +54,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
       <body
-        className={`${inter.variable} ${orbitron.variable} antialiased min-h-screen flex flex-col`}
+        className="antialiased min-h-screen flex flex-col"
         style={{ background: "var(--color-dark-900)" }}
       >
         <CursorTracker />

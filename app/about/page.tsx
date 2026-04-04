@@ -28,7 +28,7 @@ export default async function AboutPage() {
                             {/* Avatar */}
                             <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-6 group">
                                 <img
-                                    src={settings?.profileImage || "/uploads/main-page/avatar.jpg"}
+                                    src={settings?.profileImage || "/uploads/projects/main-page/0204ecfc-f7f7-484d-ae52-57f9ef6c5460.gif"}
                                     alt={settings?.profileName || "Hamza"}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                 />

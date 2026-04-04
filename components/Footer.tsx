@@ -25,7 +25,7 @@ export default function Footer() {
                                 fontSize: "2rem",
                             }}
                         >
-                            <a href="/">Aizen.tr</a>
+                            <Link href="/">Aizen.tr</Link>
                         </h3>
                         <p className="text-sm" style={{ color: "#64748b" }}>
                             Soul Reaper&apos;s Digital Realm — crafting code with the precision of a Shinigami&apos;s blade.

@@ -233,7 +233,7 @@ export default function HomeClient(props: {
             <div className="absolute -inset-4 bg-gradient-to-r from-purple-500 to-blue-500 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
             <div className="relative glass-card rounded-3xl overflow-hidden border border-white/10 aspect-square">
               <img
-                src={settings?.profileImage || "/uploads/main-page/avatar.jpg"}
+                src={settings?.profileImage || "/uploads/projects/main-page/0204ecfc-f7f7-484d-ae52-57f9ef6c5460.gif"}
                 alt={settings?.profileName || "Hamza"}
                 className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
               />
@@ -346,4 +346,3 @@ export default function HomeClient(props: {
     </div>
   );
 }
-

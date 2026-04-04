@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { readJSON, writeJSON } from "@/lib/jsonStore";
+import { deleteProject, getProjectBySlug, updateProject } from "@/lib/dataStore";
 import { authMiddleware } from "@/lib/auth";
-import type { Project } from "@/lib/api";
 
 export async function PUT(
     request: Request,
@@ -13,17 +12,21 @@ export async function PUT(
     try {
         const resolvedParams = await params;
         const body = await request.json();
-        const projects = readJSON<Project[]>("projects.json");
-        const idx = projects.findIndex((p) => p.id === resolvedParams.id);
+        const { slug } = body as { slug?: string };
 
-        if (idx === -1) {
+        if (slug) {
+            const existingProject = await getProjectBySlug(slug);
+            if (existingProject && existingProject.id !== resolvedParams.id) {
+                return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
+            }
+        }
+
+        const project = await updateProject(resolvedParams.id, body);
+        if (!project) {
             return NextResponse.json({ error: "Project not found" }, { status: 404 });
         }
 
-        projects[idx] = { ...projects[idx], ...body, updated_at: new Date().toISOString() };
-        writeJSON("projects.json", projects);
-
-        return NextResponse.json(projects[idx]);
+        return NextResponse.json(project);
     } catch {
         return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
@@ -37,13 +40,10 @@ export async function DELETE(
     if (authError) return authError;
 
     const resolvedParams = await params;
-    const projects = readJSON<Project[]>("projects.json");
-    const filtered = projects.filter((p) => p.id !== resolvedParams.id);
-
-    if (filtered.length === projects.length) {
+    const deleted = await deleteProject(resolvedParams.id);
+    if (!deleted) {
         return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    writeJSON("projects.json", filtered);
     return NextResponse.json({ ok: true });
 }

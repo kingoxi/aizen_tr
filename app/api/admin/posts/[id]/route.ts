@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { readJSON, writeJSON } from "@/lib/jsonStore";
+import { deletePost, getPostBySlug, updatePost } from "@/lib/dataStore";
 import { authMiddleware } from "@/lib/auth";
-import type { Post } from "@/lib/api";
 
 export async function PUT(
     request: Request,
@@ -13,30 +12,21 @@ export async function PUT(
     try {
         const resolvedParams = await params;
         const body = await request.json();
-        const posts = readJSON<Post[]>("posts.json");
-        const idx = posts.findIndex((p) => p.id === resolvedParams.id);
+        const { slug } = body as { slug?: string };
 
-        if (idx === -1) {
+        if (slug) {
+            const existingPost = await getPostBySlug(slug);
+            if (existingPost && existingPost.id !== resolvedParams.id) {
+                return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
+            }
+        }
+
+        const post = await updatePost(resolvedParams.id, body);
+        if (!post) {
             return NextResponse.json({ error: "Post not found" }, { status: 404 });
         }
 
-        const { title, slug, excerpt, content, cover_image, metaTitle, metaDescription, metaKeywords } = body;
-
-        posts[idx] = {
-            ...posts[idx],
-            title: title || posts[idx].title,
-            slug: slug || posts[idx].slug,
-            excerpt: excerpt ?? posts[idx].excerpt,
-            content: content || posts[idx].content,
-            cover_image: cover_image ?? posts[idx].cover_image,
-            metaTitle: metaTitle ?? posts[idx].metaTitle,
-            metaDescription: metaDescription ?? posts[idx].metaDescription,
-            metaKeywords: metaKeywords ?? posts[idx].metaKeywords,
-            updated_at: new Date().toISOString(),
-        };
-
-        writeJSON("posts.json", posts);
-        return NextResponse.json(posts[idx]);
+        return NextResponse.json(post);
     } catch {
         return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
@@ -50,13 +40,11 @@ export async function DELETE(
     if (authError) return authError;
 
     const resolvedParams = await params;
-    const posts = readJSON<Post[]>("posts.json");
-    const filtered = posts.filter((p) => p.id !== resolvedParams.id);
+    const deleted = await deletePost(resolvedParams.id);
 
-    if (filtered.length === posts.length) {
+    if (!deleted) {
         return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    writeJSON("posts.json", filtered);
     return NextResponse.json({ ok: true });
 }

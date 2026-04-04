@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJSON, writeJSON } from "@/lib/jsonStore";
+import { findUserById, findUserByUsername, updateUser } from "@/lib/dataStore";
 import { authMiddleware, getAdminUser } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
@@ -17,40 +17,41 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Current password is required" }, { status: 400 });
         }
 
-        const users = readJSON<any[]>("users.json");
-        const userIdx = users.findIndex((u) => u.id === admin.id);
-
-        if (userIdx === -1) {
+        const user = await findUserById(admin.id);
+        if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
-        const user = users[userIdx];
-
-        // Verify current password
         const isValid = await bcrypt.compare(currentPassword, user.password);
         if (!isValid) {
             return NextResponse.json({ error: "Incorrect current password" }, { status: 400 });
         }
 
-        // Update fields
+        let nextUsername = user.username;
+        let nextPassword = user.password;
+
         if (newUsername) {
-            // Check if username already exists (excluding self)
-            const exists = users.find(u => u.username === newUsername && u.id !== admin.id);
-            if (exists) {
+            const existingUser = await findUserByUsername(newUsername);
+            if (existingUser && existingUser.id !== admin.id) {
                 return NextResponse.json({ error: "Username already taken" }, { status: 400 });
             }
-            user.username = newUsername;
+            nextUsername = newUsername;
         }
 
         if (newPassword) {
-            user.password = await bcrypt.hash(newPassword, 12);
+            nextPassword = await bcrypt.hash(newPassword, 12);
         }
 
-        users[userIdx] = user;
-        writeJSON("users.json", users);
+        await updateUser(admin.id, {
+            username: nextUsername,
+            password: nextPassword,
+        });
 
         return NextResponse.json({ ok: true, message: "Profile updated successfully" });
-    } catch (err: any) {
-        return NextResponse.json({ error: err.message || "Failed to update profile" }, { status: 500 });
+    } catch (err: unknown) {
+        return NextResponse.json(
+            { error: err instanceof Error ? err.message : "Failed to update profile" },
+            { status: 500 }
+        );
     }
 }

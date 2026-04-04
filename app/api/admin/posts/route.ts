@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJSON, writeJSON } from "@/lib/jsonStore";
+import { createPost, getPostBySlug, listPosts } from "@/lib/dataStore";
 import { authMiddleware } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 import type { Post } from "@/lib/api";
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const authError = await authMiddleware(request);
     if (authError) return authError;
 
-    const posts = readJSON<Post[]>("posts.json");
+    const posts = await listPosts();
     return NextResponse.json(posts);
 }
 
@@ -27,8 +27,8 @@ export async function POST(request: Request) {
             );
         }
 
-        const posts = readJSON<Post[]>("posts.json");
-        if (posts.find((p) => p.slug === slug)) {
+        const existingPost = await getPostBySlug(slug);
+        if (existingPost) {
             return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
         }
 
@@ -47,8 +47,7 @@ export async function POST(request: Request) {
             metaKeywords: metaKeywords || "",
         };
 
-        posts.unshift(post);
-        writeJSON("posts.json", posts);
+        await createPost(post);
 
         return NextResponse.json(post, { status: 201 });
     } catch {

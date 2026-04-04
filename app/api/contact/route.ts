@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJSON, writeJSON } from "@/lib/jsonStore";
+import { createContact } from "@/lib/dataStore";
 import { v4 as uuidv4 } from "uuid";
 import type { Contact, ContactFormData } from "@/lib/api";
 
@@ -19,8 +19,6 @@ export async function POST(request: Request) {
             );
         }
 
-        const contacts = readJSON<Contact[]>("contacts.json");
-
         const newContact: Contact = {
             id: uuidv4(),
             name: body.name,
@@ -30,8 +28,7 @@ export async function POST(request: Request) {
             created_at: new Date().toISOString(),
         };
 
-        contacts.unshift(newContact);
-        writeJSON("contacts.json", contacts);
+        await createContact(newContact);
 
         return NextResponse.json({ ok: true, message: "Message received successfully" });
     } catch (err: unknown) {

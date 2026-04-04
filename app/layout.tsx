@@ -21,6 +21,8 @@ import { getServerSettings } from "@/lib/serverApi";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getServerSettings();
+  const siteUrl = process.env.SITE_URL || "https://aizen.tr";
+  const siteName = process.env.SITE_NAME || "aizen.tr";
 
   const defaultTitle = settings?.metaTitle || "Aizen — Digital Architect Portfolio";
   const defaultDescription = settings?.metaDescription || "Hamza Nuriddinov's personal portfolio and blog. Showcasing software projects, FRC robotics achievements, and deep dives into modern web development.";
@@ -30,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: {
-      template: "%s | aizen.tr",
+      template: `%s | ${siteName}`,
       default: defaultTitle,
     },
     description: defaultDescription,
@@ -50,8 +52,8 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       locale: "en_US",
-      url: "https://aizen.tr",
-      siteName: "Aizen.tr",
+      url: siteUrl,
+      siteName,
       title: defaultTitle,
       description: defaultDescription,
     },

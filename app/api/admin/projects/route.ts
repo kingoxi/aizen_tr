@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJSON, writeJSON } from "@/lib/jsonStore";
+import { createProject, getProjectBySlug, listProjects } from "@/lib/dataStore";
 import { authMiddleware } from "@/lib/auth";
 import { v4 as uuidv4 } from "uuid";
 import type { Project } from "@/lib/api";
@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const authError = await authMiddleware(request);
     if (authError) return authError;
 
-    const projects = readJSON<Project[]>("projects.json");
+    const projects = await listProjects();
     return NextResponse.json(projects);
 }
 
@@ -18,14 +18,14 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { name, slug, description, project_url, github_url, cover_image, gallery, metaTitle, metaDescription, metaKeywords } = body;
+        const { name, slug, description, project_url, github_url, cover_image, gallery, root_path, metaTitle, metaDescription, metaKeywords } = body;
 
         if (!name || !slug) {
             return NextResponse.json({ error: "name and slug are required" }, { status: 400 });
         }
 
-        const projects = readJSON<Project[]>("projects.json");
-        if (projects.find((p) => p.slug === slug)) {
+        const existingProject = await getProjectBySlug(slug);
+        if (existingProject) {
             return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
         }
 
@@ -39,6 +39,7 @@ export async function POST(request: Request) {
             gallery: gallery || [],
             project_url: project_url || "",
             github_url: github_url || "",
+            root_path: root_path || "",
             created_at: now,
             updated_at: now,
             metaTitle: metaTitle || "",
@@ -46,8 +47,7 @@ export async function POST(request: Request) {
             metaKeywords: metaKeywords || "",
         };
 
-        projects.unshift(project);
-        writeJSON("projects.json", projects);
+        await createProject(project);
 
         return NextResponse.json(project, { status: 201 });
     } catch {

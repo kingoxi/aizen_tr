@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { readJSON } from "@/lib/jsonStore";
+import { findUserByUsername } from "@/lib/dataStore";
 import { signToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
@@ -46,8 +46,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const users = readJSON<any[]>("users.json");
-        const user = users.find((u) => u.username === username);
+        const user = await findUserByUsername(username);
 
         if (!user) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
@@ -58,7 +57,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
-        const token = signToken({ id: user.id, username: user.username, role: "admin" });
+        const token = signToken({ id: user.id, username: user.username, role: user.role || "admin" });
 
         const response = NextResponse.json({ ok: true, username: user.username });
 

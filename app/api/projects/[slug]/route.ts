@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { readJSON } from "@/lib/jsonStore";
-import type { Project } from "@/lib/api";
+import { getProjectBySlug } from "@/lib/dataStore";
 
 export async function GET(
     request: Request,
     { params }: { params: Promise<{ slug: string }> }
 ) {
     const resolvedParams = await params;
-    const projects = readJSON<Project[]>("projects.json");
-    const project = projects.find((p) => p.slug === resolvedParams.slug);
+    const project = await getProjectBySlug(resolvedParams.slug);
 
     if (!project) {
         return NextResponse.json({ error: "Project not found" }, { status: 404 });

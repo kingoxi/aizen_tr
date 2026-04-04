@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import { readJSON } from "@/lib/jsonStore";
-import type { Project } from "@/lib/api";
+import { listProjects } from "@/lib/dataStore";
 
 export async function GET() {
-    const projects = readJSON<Project[]>("projects.json");
+    const projects = await listProjects();
     return NextResponse.json(projects);
 }

@@ -145,6 +145,7 @@ export interface Project {
     gallery: string[];
     project_url: string;
     github_url: string;
+    root_path?: string;
     created_at: string;
     updated_at: string;
     metaTitle?: string;
